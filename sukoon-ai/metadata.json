@@ -1,0 +1,6 @@
+{
+  "name": "Sukoon AI",
+  "description": "A mental wellness platform dashboard designed to provide a safe, welcoming, and supportive digital space.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

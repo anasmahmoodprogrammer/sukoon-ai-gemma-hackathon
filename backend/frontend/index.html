@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sukoon AI | Mental Well-being Companion</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #2c5f5d;
+            --soft-sage: #94af9f;
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --crisis-red: #d93025;
+            --user-bubble: #2c5f5d;
+            --ai-bubble: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            padding: 1rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo h1 {
+            color: var(--primary-teal);
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            color: #666;
+            max-width: 300px;
+            text-align: right;
+            line-height: 1.2;
+        }
+
+        /* Chat Window */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.2rem;
+            border-radius: 15px;
+            line-height: 1.5;
+            font-size: 1rem;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: var(--user-bubble);
+            color: white;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 4px 15px rgba(44, 95, 93, 0.2);
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: var(--ai-bubble);
+            color: #333;
+            border-bottom-left-radius: 2px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Safety Card */
+        .safety-card {
+            background: #fff5f5;
+            border: 2px solid var(--crisis-red);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            color: #b71c1c;
+            box-shadow: 0 10px 30px rgba(217, 48, 37, 0.2);
+        }
+
+        .safety-card h3 {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .safety-card ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .safety-card li {
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 1.5rem 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 30px;
+            padding: 0.5rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 0.8rem 0;
+            font-size: 1rem;
+            background: transparent;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-teal);
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        #send-btn {
+            background: var(--primary-teal);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        #send-btn:hover {
+            background: #1e4140;
+        }
+
+        /* Floating Crisis Button */
+        .crisis-float {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: var(--crisis-red);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 15px rgba(217, 48, 37, 0.4);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .crisis-float:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(217, 48, 37, 0.6);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .disclaimer {
+                display: none;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <h1>Sukoon AI</h1>
+        </div>
+        <div class="disclaimer">
+            Sukoon AI is a peer support tool, not a licensed therapist. If you are in immediate danger, call a helpline.
+        </div>
+    </header>
+
+    <div id="chat-container">
+        <div class="message ai-message">
+            Assalam-o-Alaikum. I am Sukoon AI, your mental well-being companion. How are you feeling today?
+        </div>
+    </div>
+
+    <a href="tel:03117786264" class="crisis-float">
+        <i class="fas fa-phone-alt"></i> CRISIS HELPLINE
+    </a>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+            <button class="icon-btn" title="Voice Input"><i class="fas fa-microphone"></i></button>
+        </div>
+        <button id="send-btn" class="icon-btn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Function to append message to UI
+        function appendMessage(text, isUser) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            msgDiv.innerText = text;
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return msgDiv;
+        }
+
+        // Function to show Safety Card
+        function showSafetyCard() {
+            const card = document.createElement('div');
+            card.className = 'safety-card';
+            card.innerHTML = `
+                <h3><i class="fas fa-exclamation-triangle"></i> Please reach out for help</h3>
+                <p>It sounds like you're going through a very difficult time. Please connect with professional support:</p>
+                <ul>
+                    <li>Umang Pakistan: 0311-7786264 (24/7)</li>
+                    <li>SCPR Helpline: 0800-44111</li>
+                </ul>
+            `;
+            chatContainer.appendChild(card);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Clear input and add user message
+            userInput.value = '';
+            appendMessage(text, true);
+
+            // Create placeholder for AI response
+            const aiMsgDiv = appendMessage("...", false);
+            let fullAiResponse = "";
+
+            try {
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: "user-123",
+                        text: text
+                    })
+                });
+
+                if (!response.ok) throw new Error("Failed to connect to Sukoon AI");
+
+                // Read the stream
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                let sseBuffer = "";
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+
+                    sseBuffer += decoder.decode(value, {stream: true});
+                    const lines = sseBuffer.split('\n');
+                    sseBuffer = lines.pop(); // Keep incomplete line
+
+                    let isError = false;
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+                        if (line.startsWith('event: error')) {
+                            isError = true;
+                        } else if (line.startsWith('data: ') && isError) {
+                            try {
+                                const errData = JSON.parse(line.slice(6));
+                                aiMsgDiv.innerText = "Error: " + errData.error;
+                            } catch(e) {}
+                            isError = false;
+                        } else if (line.startsWith('data: ') && lines[i-1] !== 'event: end' && lines[i-1] !== 'event: error') {
+                            const data = line.slice(6);
+                            try {
+                                const parsedData = JSON.parse(data);
+                                if (parsedData.chunk) {
+                                    fullAiResponse += parsedData.chunk;
+                                    const match = fullAiResponse.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)/);
+                                    if (match) {
+                                        try { aiMsgDiv.innerText = JSON.parse('"' + match[1] + '"'); } 
+                                        catch(e) { aiMsgDiv.innerText = match[1]; }
+                                    }
+                                }
+                            } catch(e) {}
+                        } else if (line.startsWith('event: end')) {
+                            const nextLine = lines[i + 1];
+                            if (nextLine && nextLine.startsWith('data: ')) {
+                                try {
+                                    const endData = JSON.parse(nextLine.slice(6));
+                                    if (endData.complete && endData.complete.reply) {
+                                        aiMsgDiv.innerText = endData.complete.reply;
+                                    }
+                                    if (endData.complete && endData.complete.risk_level === "crisis") {
+                                        showSafetyCard();
+                                    }
+                                } catch(e) {}
+                            }
+                        }
+                    }
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+
+            } catch (error) {
+                aiMsgDiv.innerText = "I'm having trouble connecting right now. Please try again or call the helpline.";
+                console.error(error);
+            }
+        }
+
+        // Event Listeners
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Focus input on load
+        window.onload = () => userInput.focus();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,459 @@
+Software Requirements Specification
+Sukoon AI (سکون) — a culturally sensitive mental well-being companion for Pakistan
+Prepared for: Build with Gemma — NUTECH Islamabad Hackathon
+Document version 1.0  ·  July 14, 2026
+Structure adapted from the IEEE 830 SRS standard
+Version
+Date
+Change
+1.0
+July 14, 2026
+Initial SRS, produced from the shortlisted hackathon proposal plus added safety, accessibility, and de-stigmatization requirements (marked * throughout).
+Table of contents
+1. Introduction
+1.1 Purpose
+1.2 Scope
+1.3 Intended audience
+1.4 Definitions, acronyms, and abbreviations
+1.5 References
+1.6 Document conventions
+2. Overall description
+2.1 Product perspective
+2.2 Product functions (summary)
+2.3 User classes and characteristics
+2.4 Operating environment
+2.5 Design and implementation constraints
+2.6 Assumptions and dependencies
+3. Functional requirements (modules A-G)
+4. Non-functional requirements
+5. External interface requirements
+5.1 User interfaces
+5.2 Hardware interfaces
+5.3 Software interfaces
+5.4 Communication interfaces
+6. System architecture overview
+7. Safety requirements (non-negotiable)
+8. Phased implementation plan
+9. Traceability to judging criteria
+10. Appendices
+Appendix A — sample Gemma 4 system prompt
+Appendix B — verified crisis resource directory (Pakistan)
+1. Introduction
+1.1 Purpose
+This document specifies the functional and non-functional requirements for Sukoon AI, an Urdu-first conversational well-being companion built on Gemma 4 for the Build with Gemma NUTECH Islamabad hackathon. It is written to be implementable within the hackathon's compressed timeline and to map directly onto the published judging criteria.
+1.2 Scope
+Sukoon AI is a web-based chat companion that listens, validates feelings, and offers culturally appropriate coping suggestions in Urdu script, Roman Urdu, or English. It is explicitly not a diagnostic or clinical tool. In scope for the hackathon build: text chat, an optional voice input, a safety/crisis-escalation layer, and an anonymized analytics view for the demo. Out of scope for the hackathon build: user accounts, payment, native mobile apps, and integration with electronic health records.
+1.3 Intended audience
+Primary users: Pakistani residents experiencing everyday stress, anxiety, or isolation who are unlikely to seek formal help due to stigma.
+At-risk users: people expressing self-harm or crisis-level distress, who need to be routed to real human help, not kept in conversation with the AI.
+Secondary audience: hackathon judges evaluating Gemma integration, innovation, functionality, and the writeup.
+User characteristics vary widely in English literacy, smartphone comfort, and willingness to discuss mental health at all — the design should not assume a tech-fluent, English-fluent user.
+1.4 Definitions, acronyms, and abbreviations
+Term
+Definition
+SRS
+Software Requirements Specification — this document.
+FR / NFR
+Functional Requirement / Non-Functional Requirement.
+MVP
+Minimum Viable Product.
+LLM
+Large Language Model.
+PII
+Personally Identifiable Information.
+MoSCoW
+Prioritization scheme: Must have, Should have, Could have, Won't have this time.
+Risk level
+The output of the safety classifier: none, elevated, or crisis.
+Roman Urdu
+Urdu written using the Latin alphabet, common in Pakistani texting and chat.
+1.5 References
+Google, "Gemma 4: byte for byte, the most capable open models" — blog.google, April 2, 2026.
+Google AI for Developers, Gemma 4 model card — ai.google.dev/gemma/docs/core/model_card_4.
+Umang Pakistan mental health helpline — umang.com.pk.
+Rozan Pakistan — rozan.org.
+UNFPA Pakistan, National Youth Helpline — pakistan.unfpa.org.
+Data protection landscape in Pakistan — recordinglaw.com and dlapiperdataprotection.com, accessed July 2026.
+"Build with Gemma: NUTECH Islamabad" shortlist notice (source document for this SRS).
+1.6 Document conventions
+Requirements are identified by a module letter and number (e.g. C2). An asterisk after the ID (e.g. C2*) marks a requirement that extends beyond the original submitted proposal, added to strengthen safety, accessibility, or the innovation/impact score. Priority uses MoSCoW:
+Level
+Meaning
+Must
+Required for a defensible, safe hackathon submission — do not present without these.
+Should
+Materially improves the demo and score; implement if time allows after all Musts.
+Could
+Nice to have; only after all Must and Should items are done.
+Won't
+Explicitly out of scope for this hackathon build.
+2. Overall description
+2.1 Product perspective
+Sukoon AI is a new, standalone product. It positions itself alongside — never as a replacement for — existing licensed mental-health services and crisis helplines in Pakistan (Appendix B). Its value is being the low-friction first step: anonymous, judgment-free, and in the user's own language, for people who would not otherwise reach out at all.
+2.2 Product functions (summary)
+Culturally aware, Urdu-first conversational support (Module A).
+Optional voice input using Gemma 4's native audio understanding (Module B).
+Real-time safety classification and crisis escalation (Module C).
+Privacy-first, anonymous-by-default data handling (Module D).
+Accessible, low-bandwidth-friendly interface (Module E).
+Anonymized impact dashboard for the demo (Module F).
+Optional de-stigmatization / awareness features (Module G).
+2.3 User classes and characteristics
+Class
+Characteristics
+Priority for design
+General public user
+Mixed English literacy; may write in Roman Urdu or Urdu script; first time discussing mental health with anyone or anything.
+Primary
+At-risk user
+Same as above, but expressing crisis-level distress; needs to reach a human quickly, not stay in AI conversation.
+Primary, safety-critical
+Hackathon judge
+Time-limited; needs to see Gemma 4 usage, safety design, and a working prototype within minutes.
+Secondary, demo-driving
+2.4 Operating environment
+Modern evergreen mobile or desktop browser; Node.js backend; Gemma 4 accessed via API or local/edge inference for the smaller model sizes. No native app required for the hackathon build.
+2.5 Design and implementation constraints
+Per the hackathon rules, no code may be pushed to GitHub and no repository created before hackathon day (see Phase 0/1).
+The Kaggle Writeup and final submission are due July 15, alongside the live presentation at the NUTECH Seminar Hall.
+The core model must be Gemma 4, per the hackathon's judging rubric.
+Build time is effectively a single hackathon day — the phased plan in Section 8 is time-boxed accordingly.
+2.6 Assumptions and dependencies
+Gemma 4 API access/quota is available and stable through the demo window.
+The venue provides reliable internet for a live, unscripted demo.
+Listed helpline numbers remain reachable — verify immediately before the demo (Appendix B).
+Users have access to a smartphone or computer with a modern browser.
+3. Functional requirements
+Requirements are grouped by module. IDs marked with * are additions beyond the original proposal — see Section 1.6.
+Module A — Conversational core
+ID
+Requirement
+Priority
+Phase
+A1
+The system shall provide a single-window chat interface where users can type in Urdu script or Roman Urdu.
+Must
+Phase 2
+A2
+The system shall send every user message to Gemma 4 together with a fixed system prompt establishing the Sukoon persona (empathetic, non-clinical, culturally aware). See Appendix A.
+Must
+Phase 2
+A3
+The system shall stream Gemma 4's reply back to the user incrementally to reduce perceived latency.
+Should
+Phase 2
+A4
+The system shall detect whether the user is writing in Urdu script, Roman Urdu, or English, and reply in the same register by default.
+Must
+Phase 2
+A5*
+The system shall let the user choose a secular or faith-informed framing for coping suggestions, and respect that choice for the rest of the session.
+Should
+Phase 4
+A6*
+The system shall offer at least three quick-start prompts (e.g. exam stress, family pressure) so first-time users don't face a blank input box.
+Should
+Phase 5
+Module B — Voice and multimodal input
+ID
+Requirement
+Priority
+Phase
+B1
+The system shall let users record voice input via a mic button and submit it directly to Gemma 4 for native audio understanding, without a separate speech-to-text service.
+Should
+Phase 4
+B2
+The system shall show a live recording indicator while capturing voice input.
+Could
+Phase 4
+B3
+The system shall let the user review or cancel a recording before it is sent.
+Must (if B1 shipped)
+Phase 4
+Module C — Safety and crisis management (safety-critical)
+This module did not exist in the original proposal. It is the single highest-priority addition in this SRS: an anonymous companion aimed at people with mental health struggles must have a real escalation path.
+ID
+Requirement
+Priority
+Phase
+C1*
+The system shall run a structured risk-classification pass on every user turn, returning a JSON risk_level of none, elevated, or crisis via Gemma 4's function-calling/structured output.
+Must
+Phase 3
+C2*
+When risk_level = crisis, the system shall interrupt normal persona behaviour and show a dedicated safety card with at least two verified Pakistani helpline numbers and a tap-to-call action. See Appendix B.
+Must
+Phase 3
+C3*
+The system shall never generate a clinical diagnosis or prescribe a medication or dosage, under any prompt.
+Must
+Phase 2
+C4*
+The system shall show a persistent, non-dismissible crisis-helpline access point at all times, regardless of detected risk level.
+Must
+Phase 3
+C5*
+The system shall log crisis-flagged events as a timestamp and anonymous session ID only, with no message content, for reliability review.
+Should
+Phase 3
+C6*
+The system shall show a standing disclaimer, visible on first use and reachable thereafter, that Sukoon is peer support, not a licensed therapist.
+Must
+Phase 2
+Module D — Privacy and data handling
+ID
+Requirement
+Priority
+Phase
+D1
+The system shall not require account creation, a phone number, or an email address to use core chat functionality.
+Must
+Phase 2
+D2
+The system shall not store raw conversation text linked to any persistent user identifier.
+Must
+Phase 2
+D3*
+The system shall store only aggregate, anonymized topic/sentiment trend data (e.g. daily counts by category) for the analytics dashboard.
+Must
+Phase 5
+D4*
+The system shall provide a visible "clear session" control that immediately deletes local conversation state.
+Should
+Phase 5
+D5
+All client-server communication shall be encrypted in transit (TLS 1.2 or later).
+Must
+Phase 2
+Module E — Localization and accessibility
+ID
+Requirement
+Priority
+Phase
+E1
+The UI shall correctly render mixed left-to-right (Roman Urdu/English) and right-to-left (Urdu script) text without layout breakage.
+Must
+Phase 2
+E2*
+The system shall support adjustable font size for users with limited eyesight or older users.
+Should
+Phase 5
+E3*
+The system shall remain usable on low-bandwidth (3G-equivalent) connections, with a lightweight initial payload.
+Should
+Phase 5
+E4
+Primary controls (mic, send, helpline) shall use large touch targets paired with icon and label, for low-literacy users.
+Must
+Phase 2
+Module F — Analytics dashboard (for demo and judges)
+ID
+Requirement
+Priority
+Phase
+F1*
+The system shall provide a simple dashboard of anonymized aggregate stats (total conversations, top stress categories, escalation count) for the hackathon demo.
+Should
+Phase 5
+F2
+The dashboard shall never display individual message content.
+Must
+Phase 5
+Module G — De-stigmatization and awareness (recommended additions)
+Optional, roadmap-facing features that speak directly to the "nobody talks about mental health" problem statement, without adding hackathon-day build risk.
+ID
+Requirement
+Priority
+Phase
+G1*
+The system should show an anonymized, aggregate social-proof message (e.g. "1,200 people talked about exam stress this week") to reduce felt isolation.
+Could
+Phase 5 / roadmap
+G2*
+The system could surface a short, vetted psychoeducational fact card periodically, normalizing therapy and help-seeking.
+Could
+Phase 7 / roadmap
+4. Non-functional requirements
+4.1 Performance
+ID
+Requirement
+Priority
+NFR-P1
+The system shall return the first token of a Gemma 4 reply within 3 seconds under normal load.
+Must
+NFR-P2
+A voice round trip (record to first reply token) shall complete within 6 seconds for a 15-second clip.
+Should
+4.2 Usability
+ID
+Requirement
+Priority
+NFR-U1
+A first-time user shall be able to send their first message within 30 seconds of landing on the page, with no instructions required.
+Must
+NFR-U2
+The interface shall meet WCAG 2.1 AA minimum colour-contrast ratios.
+Should
+4.3 Reliability and availability
+ID
+Requirement
+Priority
+NFR-R1
+If the Gemma 4 endpoint is unreachable, the system shall show a clear error and retry option rather than a blank or broken UI.
+Must
+NFR-R2
+The demo build shall maintain effectively 100% uptime during the July 15 presentation window (single-session, judge-facing reliability, not a production SLA).
+Must
+4.4 Security and privacy
+ID
+Requirement
+Priority
+NFR-S1
+No personally identifiable information shall be sent to or stored by any third-party analytics tool.
+Must
+NFR-S2
+API keys and credentials shall never be exposed in client-side code or committed to the repository.
+Must
+4.5 Legal and compliance
+ID
+Requirement
+Priority
+NFR-C1
+As of mid-2026 Pakistan has no enacted, comprehensive data-protection law; the closest instrument is the Prevention of Electronic Crimes Act (PECA) 2016, amended in 2025, a criminal statute rather than a privacy framework. Because there is no binding data-minimization rule to rely on, the system shall still follow data-minimization and consent-by-default practice equivalent to internationally recognized standards (see D1-D3, D5).
+Must
+4.6 Scalability
+ID
+Requirement
+Priority
+NFR-SC1
+The backend shall be able to scale horizontally independent of the Gemma 4 inference endpoint.
+Could
+4.7 Maintainability and portability
+ID
+Requirement
+Priority
+NFR-M1
+The persona/system-prompt configuration shall be separated from application logic so it can be updated without a backend redeploy.
+Should
+NFR-M2
+The frontend shall run on any evergreen browser (Chrome, Edge, Safari, Firefox) with no plugins required.
+Must
+4.8 Ethical and safety non-functionals
+ID
+Requirement
+Priority
+NFR-E1
+The system shall never simulate being a licensed human therapist or claim clinical credentials, in any language or register.
+Must
+NFR-E2
+Latency from a crisis-level classification to the safety card being shown shall not exceed 2 seconds.
+Must
+5. External interface requirements
+5.1 User interfaces
+Single-window chat view, mic button, and a persistent helpline access point (FR C4).
+Dedicated, visually distinct safety card for crisis-level replies (FR C2).
+Mixed-direction text rendering for Urdu script and Roman Urdu/English (FR E1).
+5.2 Hardware interfaces
+Device microphone, accessed via standard browser permissions, for voice input (Module B).
+5.3 Software interfaces
+Gemma 4 API (or local/edge inference for E2B/E4B sizes) for conversation and risk classification.
+A lightweight datastore (SQLite for the demo build is sufficient) for anonymized aggregate trend data only.
+5.4 Communication interfaces
+HTTPS for all client-server traffic; TLS 1.2 or later (NFR-S security requirements).
+WebSocket or server-sent events for streaming replies (FR A3).
+6. System architecture overview
+At a high level, a user message (voice or text) is sent to the Gemma 4 conversational core, which replies using the Sukoon persona system prompt. In parallel, a structured risk-classification pass scores the same turn. Low or moderate risk produces a comforting, culturally aware reply; crisis-level risk produces a brief, calm reply plus an immediate safety card with real helpline numbers. Both paths write only anonymized, aggregate sentiment data to storage — never raw message content tied to an identifier. This flow was illustrated as a diagram earlier in this conversation and should be reproduced in the Kaggle Writeup.
+7. Safety requirements (non-negotiable)
+Because Sukoon AI will be used by people in real emotional distress, the following are treated as release-blocking, not aspirational. They consolidate Module C and the ethical NFRs above.
+Must never
+Provide a clinical diagnosis or a medication/dosage recommendation, in any language or framing.
+Simulate being a licensed therapist or claim clinical credentials.
+Bury or hide helpline access behind menus during a crisis-flagged conversation.
+Store raw, crisis-flagged conversation content.
+Must always
+Complete risk classification before a reply is shown to the user (FR C1).
+Surface a real, verified Pakistani helpline within 2 seconds of detecting crisis-level risk (NFR-E2).
+Keep the disclaimer and helpline access visible at all times, not only when risk is detected (FR C4, C6).
+8. Phased implementation plan
+Phases are time-boxed against the actual hackathon rules: no repository or commits before hackathon day, with submission and presentation both on July 15. Adjust the hour blocks to the real on-site schedule once known.
+Phase
+Time-box
+Goal and key deliverables
+Requirements covered
+Phase 0 — Pre-hackathon readiness
+Today, July 14 (no repo, no commits)
+Finalize this SRS, draft the Gemma 4 system prompt (Appendix A), sketch wireframes, confirm Gemma 4 API/quota access, verify helpline numbers (Appendix B), rehearse the problem narrative.
+Groundwork for A2, C1-C6
+Phase 1 — Setup
+Hour 0-1 of hackathon day
+Create the GitHub repo and initial commit (per event rules), scaffold frontend and backend, wire up the Gemma 4 API call.
+Environment only
+Phase 2 — Core conversational MVP
+Hour 1-4
+Working single-window chat: send message, get streamed Urdu/Roman Urdu reply, disclaimer visible, no diagnosis in prompt, no PII stored, HTTPS.
+A1-A4, C3, C6, D1, D2, D5, E1, E4
+Phase 3 — Safety layer
+Hour 4-7
+Add the structured risk-classification pass and the crisis safety card with real helpline numbers; persistent helpline access; anonymized crisis-event logging.
+C1, C2, C4, C5
+Phase 4 — Voice and cultural depth
+Hour 7-9
+Add mic input using Gemma 4's native audio understanding; add secular/faith-informed framing choice.
+B1-B3, A5
+Phase 5 — Dashboard, accessibility, polish
+Hour 9-11
+Build the anonymized aggregate dashboard, quick-start prompts, clear-session control, font-size control, lightweight asset pass.
+D3, D4, A6, E2, E3, F1, F2
+Phase 6 — Test, record, write up
+Hour 11-12.5
+End-to-end test of the safety path, record the demo video (kept offline until submission), draft the Kaggle Writeup from this SRS.
+NFR-R1, NFR-E2 verification
+Phase 7 — Submission and rehearsal
+Hour 12.5 to deadline
+Push final commits, publish the demo video, submit the Kaggle Writeup, rehearse the live pitch at NUTECH Seminar Hall.
+All Must-priority items
+Phase 8 — Post-hackathon roadmap (not required for judging)
+Beyond July 15
+Social-proof and psychoeducation features (G1, G2), clinician-reviewed content review, warm-handoff partnership with Umang/Rozan, offline-first PWA, Punjabi/Pashto/Sindhi expansion.
+G1, G2, NFR-SC1
+9. Traceability to judging criteria
+Maps this SRS directly onto the published weighting, so build effort tracks the score, not just feature count.
+Judging criterion
+Weight
+Primary SRS coverage
+What to show the judges
+Gemma Integration
+30%
+A2-A4 (persona + system role), C1 (structured output / function calling for risk), B1 (native audio input), NFR-M1
+Show the system prompt, show a live risk-classification JSON in the browser console or a debug panel, and use the mic to demonstrate native audio understanding.
+Innovation and impact
+30%
+Whole safety layer (Module C), destigmatization features (G1, G2), cultural framing choice (A5)
+Lead with the problem statement, then show the crisis safety card and the anonymized social-proof stat — this is the part a generic chatbot demo won't have.
+Functionality
+20%
+Phases 1-5 deliverables, NFR-P1, NFR-R1, NFR-R2
+A working, unscripted live demo that survives an unreachable-API test without breaking.
+Presentation and writeup
+20%
+This SRS document end to end
+Structure the Kaggle Writeup using this SRS's section order: problem, requirements, architecture, phased build, safety design.
+10. Appendices
+Appendix A — sample Gemma 4 system prompt
+Condensed prompt operationalizing FR A2, C1, C3, and C6. Expand with a few worked examples during Phase 2, and keep it in a config file separate from application code (NFR-M1).
+You are Sukoon, a warm, non-judgmental listener for people in Pakistan.Always reply in the user's own register: Urdu script, Roman Urdu, or English.Validate feelings first. Offer gentle, practical coping ideas suited to local life. Never give a diagnosis, never give a medication or dosage, never claim to be a licensed therapist.Respect the user's chosen framing (secular or faith-informed) for coping suggestions.On every turn, in addition to your reply, also output a JSON risk object: {"risk_level": "none|elevated|crisis", "flags": [...]}.If risk_level is "crisis": keep your reply brief and calm. Do not try to counsel the crisis away yourself — the application will surface the safety card. Your job is to stay warm, not to resolve the emergency.
+Appendix B — verified crisis resource directory (Pakistan)
+Service
+Contact
+Focus
+Umang — Pakistan's 24/7 mental health helpline
+0311 7786264 (also listed as 0311-77UMANG)
+General mental health support, staffed by clinical psychologists and psychiatrists
+Rozan counselling line
+0800-22444
+Women- and youth-focused psychosocial support
+National Youth Helpline (UNFPA/HEC)
+0800-69457
+Psychosocial, reproductive-health, and educational concerns for youth
+Different directories list slightly different numbers for the same service. Call and confirm each number the morning of the demo, and keep this list updatable without a redeploy (NFR-M1).

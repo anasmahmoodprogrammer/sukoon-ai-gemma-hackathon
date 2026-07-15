@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", sans-serif;
+  --font-body: "Nunito", sans-serif;
+
+  --color-brand-primary: #5DADE2;      /* Soft Blue */
+  --color-brand-secondary: #A8E6CF;    /* Mint Green */
+  --color-brand-accent: #CDB4DB;       /* Lavender */
+  --color-brand-bg: #F8FAFC;           /* Calm Off-White background */
+  --color-brand-dark: #2F3E46;         /* Slate Gray */
+  --color-brand-gray: #6C757D;         /* Gray */
+  
+  --color-brand-success: #81C784;      /* Soft Green */
+  --color-brand-warning: #FFB74D;      /* Warm Amber */
+  --color-brand-error: #E57373;        /* Muted Coral */
+
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+/* Professional Polish: Apply custom backgrounds, fonts, and clean layout styles */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-brand-bg);
+  background: radial-gradient(circle at top right, #F0F7FF 0%, var(--color-brand-bg) 100%);
+  color: var(--color-brand-dark);
+}
+
+/* Custom scrollbar to keep layout premium and distraction-free */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

@@ -1,0 +1,24 @@
+import zipfile
+import xml.etree.ElementTree as ET
+
+def extract_text_from_docx(docx_path):
+    try:
+        document = zipfile.ZipFile(docx_path)
+        xml_content = document.read('word/document.xml')
+        document.close()
+        tree = ET.XML(xml_content)
+        WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+        PARA = WORD_NAMESPACE + 'p'
+        TEXT = WORD_NAMESPACE + 't'
+        
+        paragraphs = []
+        for paragraph in tree.iter(PARA):
+            texts = [node.text for node in paragraph.iter(TEXT) if node.text]
+            if texts:
+                paragraphs.append(''.join(texts))
+        return '\n'.join(paragraphs)
+    except Exception as e:
+        return str(e)
+
+with open('extracted_srs.txt', 'w', encoding='utf-8') as f:
+    f.write(extract_text_from_docx(r"d:\Google Gemma 4 Hackathron\Sukoon_AI_SRS.docx"))
